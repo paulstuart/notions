@@ -1,23 +1,24 @@
-package notion
+package notions
 
 import (
 	"fmt"
 	"io"
+	"time"
 )
 
-/*
-func (s *Session) ItemAppend(parent, item *Item) error {
-	if err := s.notion.restricted(parent); err != nil {
-		return err
-	}
-	if err := s.notion.current(parent); err != nil {
-		return err
-	}
-	//s.notion.Items = append(s.notion.Items, item)
-	s.notion.cmdlog.CmdSave(DoItemAppend, "ID", parent.ID, "Add", item.ID)
-	return nil
+// Session represents a user (or API's) interaction with a Notion
+type Session struct {
+	ID      int64
+	notion  *Notion
+	account *Account
+	host    string
+	created time.Time
 }
-*/
+
+func (s *Session) Notion() *Notion {
+	return s.notion
+}
+
 func (s *Session) Print(w io.Writer) {
 	s.notion.Print(w, 1)
 }
@@ -72,6 +73,16 @@ func (s *Session) TextDelete(id int64, offset int, text string) error {
 	}
 	item.TextDelete(offset, text)
 	s.notion.CmdSave(DoTextDelete, "id", id, "text", text)
+	return nil
+}
+
+func (s *Session) TextTruncate(id int64, text string) error {
+	item, err := s.GetItem(id)
+	if err != nil {
+		return err
+	}
+	item.TextTruncate(text)
+	s.notion.CmdSave(DoTextTruncate, "id", id, "text", text)
 	return nil
 }
 

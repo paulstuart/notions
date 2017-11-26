@@ -1,4 +1,4 @@
-package notion
+package notions
 
 import (
 	"testing"
